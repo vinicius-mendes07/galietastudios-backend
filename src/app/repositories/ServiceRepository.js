@@ -33,6 +33,12 @@ class ServiceRepository {
 
     return row;
   }
+
+  async delete(id) {
+    const deleteOp = await db.query('DELETE FROM services WHERE id = $1', [id]);
+
+    return deleteOp;
+  }
 }
 
 module.exports = new ServiceRepository();

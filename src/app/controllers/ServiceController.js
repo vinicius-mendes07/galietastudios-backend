@@ -74,6 +74,18 @@ class ServiceController {
 
     res.json(service);
   }
+
+  async delete(req, res) {
+    const { id } = req.params;
+
+    if (!isValidUUID(id)) {
+      return res.status(400).json({ error: 'Invalid service id' });
+    }
+
+    await ServiceRepository.delete(id);
+
+    res.sendStatus(204);
+  }
 }
 
 module.exports = new ServiceController();
