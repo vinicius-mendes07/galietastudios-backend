@@ -74,6 +74,12 @@ class ServiceController {
       return res.status(404).json({ error: 'Service not found' });
     }
 
+    const serviceByType = await ServiceRepository.findByServiceType(service_type);
+
+    if (serviceByType && serviceByType.id !== id) {
+      return res.status(400).json({ error: 'This service type already exists' });
+    }
+
     const service = await ServiceRepository.update(id, { service_type, duration });
 
     res.json(service);
