@@ -13,6 +13,12 @@ class ServiceRepository {
     return row;
   }
 
+  async findByServiceType(service_type) {
+    const [row] = await db.query('SELECT * FROM services where service_type = $1', [service_type]);
+
+    return row;
+  }
+
   async create({ service_type, duration }) {
     const [row] = await db.query(`
       INSERT INTO services(service_type, duration)
