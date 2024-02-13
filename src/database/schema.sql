@@ -17,8 +17,11 @@ CREATE TABLE IF NOT EXISTS schedules (
 	hour TIME NOT NULL,
 	hour_end TIME NOT NULL,
 	available BOOLEAN DEFAULT TRUE,
+	status VARCHAR,
 	service_id UUID NOT NULL,
-  FOREIGN KEY(service_id) REFERENCES services(id)
+	user_id UUID NOT NULL,
+  FOREIGN KEY(service_id) REFERENCES services(id),
+  FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
 
@@ -27,5 +30,6 @@ CREATE TABLE IF NOT EXISTS users (
 	name VARCHAR NOT NULL,
 	phone VARCHAR NOT NULL,
 	email VARCHAR NOT NULL UNIQUE,
-	password VARCHAR NOT NULL
+	password VARCHAR NOT NULL,
+	role VARCHAR NOT NULL
 );
