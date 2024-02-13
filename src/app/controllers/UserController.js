@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const UserRepository = require('../repositories/UserRepository');
 const isValidUUID = require('../utils/isValidUUID');
 
@@ -35,22 +36,21 @@ class UserController {
     if (!password) return res.status(400).json({ error: 'Password is required' });
 
     const role = 'administrador';
-    // pegar o valor de role da requisição na atualização de novos colaboradores
 
-    // if (!role) return res.status(400).json({ error: 'role is required' });
-    // role tem que ser 'administrador' ou 'colaborador'
+    const userByEmail = await UserRepository.findByEmail(email);
 
-    const userExists = await UserRepository.findByEmail(email);
-
-    if (userExists) {
+    if (userByEmail) {
       return res.status(400).json({ error: 'This email is already in use' });
     }
+
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
 
     const user = await UserRepository.create({
       name,
       phone,
       email,
-      password,
+      password: hash,
       role,
     });
 
@@ -74,10 +74,6 @@ class UserController {
     if (!password) return res.status(400).json({ error: 'Password is required' });
 
     const role = 'administrador';
-    // pegar o valor de role da requisição na atualização de novos colaboradores
-
-    // if (!role) return res.status(400).json({ error: 'role is required' });
-    // role tem que ser 'administrador' ou 'colaborador'
 
     const userExists = await UserRepository.findById(id);
 
@@ -85,17 +81,20 @@ class UserController {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const contactByEmail = await UserRepository.findByEmail(email);
+    const userByEmail = await UserRepository.findByEmail(email);
 
-    if (contactByEmail && contactByEmail.id !== id) {
+    if (userByEmail && userByEmail.id !== id) {
       return res.status(400).json({ error: 'This email is already in use' });
     }
+
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
 
     const user = await UserRepository.update(id, {
       name,
       phone,
       email,
-      password,
+      password: hash,
       role,
     });
 
