@@ -2,7 +2,7 @@ const db = require('../../database');
 
 class UserRepository {
   async findAll() {
-    const rows = await db.query('SELECT * FROM users ORDER BY name');
+    const rows = await db.query('SELECT id, name, phone, email, role FROM users ORDER BY name');
 
     return rows;
   }

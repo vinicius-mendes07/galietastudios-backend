@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const UserRepository = require('../repositories/UserRepository');
 const isValidUUID = require('../utils/isValidUUID');
 
@@ -11,9 +12,14 @@ class UserController {
 
   async show(req, res) {
     const { id } = req.params;
+    const loggedUser = req.user;
 
     if (!isValidUUID(id)) {
       return res.status(400).json({ error: 'Invalid user id' });
+    }
+
+    if (loggedUser.id !== id && loggedUser.role !== 'administrador') {
+      return res.status(403).json({ error: 'Permission denied' });
     }
 
     const user = await UserRepository.findById(id);
@@ -35,11 +41,9 @@ class UserController {
     if (!email) return res.status(400).json({ error: 'Email is required' });
     if (!password) return res.status(400).json({ error: 'Password is required' });
 
-    const role = 'administrador';
+    const userExists = await UserRepository.findByEmail(email);
 
-    const userByEmail = await UserRepository.findByEmail(email);
-
-    if (userByEmail) {
+    if (userExists) {
       return res.status(400).json({ error: 'This email is already in use' });
     }
 
@@ -51,10 +55,38 @@ class UserController {
       phone,
       email,
       password: hash,
-      role,
+      role: 'administrador',
     });
 
     res.status(201).json(user);
+  }
+
+  async login(req, res) {
+    const { email, password } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    if (!password) {
+      return res.status(400).json({ error: 'Password is required' });
+    }
+
+    const user = await UserRepository.findByEmail(email);
+
+    if (!user) {
+      return res.status(404).json({ error: 'Invalid email or password' });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(404).json({ error: 'Invalid email or password' });
+    }
+
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.SECRET, { expiresIn: '1m' });
+
+    res.json({ token });
   }
 
   async update(req, res) {
@@ -63,6 +95,8 @@ class UserController {
     const {
       name, phone, email, password,
     } = req.body;
+
+    const loggedUser = req.user;
 
     if (!isValidUUID(id)) {
       return res.status(400).json({ error: 'Invalid user id' });
@@ -73,7 +107,9 @@ class UserController {
     if (!email) return res.status(400).json({ error: 'Email is required' });
     if (!password) return res.status(400).json({ error: 'Password is required' });
 
-    const role = 'administrador';
+    if (loggedUser.id !== id && loggedUser.role !== 'administrador') {
+      return res.status(403).json({ error: 'Permission denied' });
+    }
 
     const userExists = await UserRepository.findById(id);
 
@@ -95,7 +131,7 @@ class UserController {
       phone,
       email,
       password: hash,
-      role,
+      role: 'colaborador',
     });
 
     res.json(user);
