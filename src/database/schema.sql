@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS schedules (
 	hour TIME NOT NULL,
 	hour_end TIME NOT NULL,
 	available BOOLEAN DEFAULT TRUE,
-	status VARCHAR,
+	status VARCHAR DEFAULT 'pendente',
 	service_id UUID NOT NULL,
 	user_id UUID NOT NULL,
   FOREIGN KEY(service_id) REFERENCES services(id),
