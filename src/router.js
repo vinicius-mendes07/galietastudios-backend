@@ -20,9 +20,9 @@ router.put('/users/:id', authService, UserController.update);
 router.delete('/users/:id', UserController.delete);
 
 router.get('/schedules', ScheduleController.index);
-// router.get('/schedules/:id', authService, ScheduleController.show);
+router.get('/schedules/:id', ScheduleController.show);
 router.post('/schedules', ScheduleController.store);
-// router.put('/schedules/:id', authService, ScheduleController.update);
+router.put('/schedules/:id', ScheduleController.update);
 // router.delete('/schedules/:id', ScheduleController.delete);
 
 module.exports = router;

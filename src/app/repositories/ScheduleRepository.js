@@ -10,11 +10,21 @@ class ScheduleRepository {
     return rows;
   }
 
-  async findByDateAndHour({ schedule_date, hour }) {
+  async findById(id) {
+    const [row] = await db.query(`
+    SELECT id, name, phone, email, hour, hour_end, available, status, service_id, user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date
+    FROM schedules
+    WHERE id = $1
+    `, [id]);
+
+    return row;
+  }
+
+  async findByDateAndHour({ schedule_date, hour, user_id }) {
     const [row] = await db.query(`
       SELECT * FROM schedules
-      WHERE schedule_date = $1 AND hour = $2
-    `, [schedule_date, hour]);
+      WHERE schedule_date = $1 AND hour = $2 AND user_id = $3
+    `, [schedule_date, hour, user_id]);
 
     return row;
   }
@@ -43,6 +53,26 @@ class ScheduleRepository {
       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `, [name, phone, email, schedule_date, hour, hour_end, service_id, user_id]);
+
+    return row;
+  }
+
+  async update(id, {
+    name,
+    phone,
+    email,
+    schedule_date,
+    hour,
+    hour_end,
+    service_id,
+    user_id,
+  }) {
+    const [row] = await db.query(`
+      UPDATE schedules
+      SET name = $1, phone = $2, email = $3, schedule_date = $4, hour = $5, hour_end = $6, service_id = $7, user_id = $8
+      WHERE id = $9
+      RETURNING *
+    `, [name, phone, email, schedule_date, hour, hour_end, service_id, user_id, id]);
 
     return row;
   }
