@@ -76,6 +76,11 @@ class ScheduleRepository {
 
     return row;
   }
+
+  async delete(id) {
+    const deleteOp = await db.query('DELETE FROM schedules WHERE id = $1', [id]);
+    return deleteOp;
+  }
 }
 
 module.exports = new ScheduleRepository();

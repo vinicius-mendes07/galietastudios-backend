@@ -23,6 +23,6 @@ router.get('/schedules', ScheduleController.index);
 router.get('/schedules/:id', ScheduleController.show);
 router.post('/schedules', ScheduleController.store);
 router.put('/schedules/:id', ScheduleController.update);
-// router.delete('/schedules/:id', ScheduleController.delete);
+router.delete('/schedules/:id', ScheduleController.delete);
 
 module.exports = router;

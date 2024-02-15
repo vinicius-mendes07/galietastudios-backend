@@ -138,13 +138,19 @@ class ScheduleControler {
       return res.status(400).json({ error: 'This email is already in use' });
     }
 
-    const scheduleExists = await ScheduleRepository.findByDateAndHour({
+    const scheduleExists = await ScheduleRepository.findById(id);
+
+    if (!scheduleExists) {
+      return res.status(404).json({ error: 'Schedule not found' });
+    }
+
+    const scheduleByDateAndHour = await ScheduleRepository.findByDateAndHour({
       schedule_date,
       hour,
       user_id,
     });
 
-    if (scheduleExists && scheduleExists.id !== id) {
+    if (scheduleByDateAndHour && scheduleByDateAndHour.id !== id) {
       return res.status(400).json({ error: 'This date and time is already scheduled' });
     }
 
@@ -162,6 +168,17 @@ class ScheduleControler {
     });
 
     res.status(201).json(schedule);
+  }
+
+  async delete(req, res) {
+    const { id } = req.params;
+
+    if (!isValidUUID(id)) {
+      return res.status(400).json({ error: 'Invalid schedule id' });
+    }
+
+    await ScheduleRepository.delete(id);
+    res.sendStatus(204);
   }
 }
 
