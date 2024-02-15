@@ -55,7 +55,7 @@ class UserController {
       phone,
       email,
       password: hash,
-      role: 'administrador',
+      role: 'administrador', // role must be 'administrador' or 'colaborador'
     });
 
     res.status(201).json(user);

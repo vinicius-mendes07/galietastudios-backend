@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const ScheduleController = require('./app/controllers/ScheduleController');
 const ServiceController = require('./app/controllers/ServiceController');
 const UserController = require('./app/controllers/UserController');
 const authService = require('./services/authService');
@@ -17,5 +18,11 @@ router.post('/users', UserController.store);
 router.post('/users/login', UserController.login);
 router.put('/users/:id', authService, UserController.update);
 router.delete('/users/:id', UserController.delete);
+
+router.get('/schedules', ScheduleController.index);
+// router.get('/schedules/:id', authService, ScheduleController.show);
+router.post('/schedules', ScheduleController.store);
+// router.put('/schedules/:id', authService, ScheduleController.update);
+// router.delete('/schedules/:id', ScheduleController.delete);
 
 module.exports = router;
