@@ -23,6 +23,7 @@ router.get('/schedules', ScheduleController.index);
 router.get('/schedules/pending', ScheduleController.getPendings);
 router.get('/schedules/confirmed', ScheduleController.getConfirmed);
 router.get('/schedules/:id', ScheduleController.show);
+router.post('/schedules/cancel-day', ScheduleController.cancelDay);
 router.post('/schedules', ScheduleController.store);
 router.patch('/schedules/confirm/:id', ScheduleController.confirmPending);
 router.put('/schedules/:id', ScheduleController.update);

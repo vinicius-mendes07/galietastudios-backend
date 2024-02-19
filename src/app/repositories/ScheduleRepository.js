@@ -53,13 +53,42 @@ class ScheduleRepository {
     return row;
   }
 
-  async findByDateNotAvailable({ schedule_date }) {
-    const rows = await db.query(`
+  async findByDateNotAvailable(schedule_date) {
+    const [row] = await db.query(`
       SELECT * FROM schedules
       WHERE schedule_date = $1 AND available = false
     `, [schedule_date]);
 
+    return row;
+  }
+
+  async findByDay(schedule_date) {
+    const rows = await db.query(`
+      SELECT * FROM schedules
+      WHERE schedule_date = $1 AND available = true
+    `, [schedule_date]);
+
     return rows;
+  }
+
+  async cancelDay({
+    name,
+    phone,
+    email,
+    schedule_date,
+    hour,
+    hour_end,
+    available,
+    service_id,
+    user_id,
+  }) {
+    const [row] = await db.query(`
+      INSERT INTO schedules(name, phone, email, schedule_date, hour, hour_end, available, service_id, user_id)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING *
+    `, [name, phone, email, schedule_date, hour, hour_end, available, service_id, user_id]);
+
+    return row;
   }
 
   async create({
