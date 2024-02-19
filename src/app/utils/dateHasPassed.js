@@ -1,15 +1,12 @@
 function dateHasPassed(schedule_date) {
-  const scheduleDateInDateFormat = new Date(schedule_date);
+  const scheduleDate = new Date(schedule_date);
 
-  scheduleDateInDateFormat.setUTCHours(0, 0, 0, 0);
-
-  scheduleDateInDateFormat.toLocaleString('en-US', { timeZone: 'Europe/Lisbon' });
+  scheduleDate.setUTCHours(0, 0, 0, 0);
 
   const currentDate = new Date();
   currentDate.setUTCHours(0, 0, 0, 0);
-  currentDate.toLocaleString('en-US', { timeZone: 'Europe/Lisbon' });
 
-  if (scheduleDateInDateFormat < currentDate) {
+  if (scheduleDate.getTime() < currentDate.getTime()) {
     return true;
   }
 
