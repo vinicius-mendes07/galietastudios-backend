@@ -48,6 +48,19 @@ class ScheduleControler {
     res.json(schedules);
   }
 
+  async getConfirmed(req, res) {
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
+
+    const ISODate = currentDate.toISOString();
+
+    const dateOnly = ISODate.split('T')[0];
+
+    const schedules = await ScheduleRepository.findByConfirmed(dateOnly);
+
+    res.json(schedules);
+  }
+
   async store(req, res) {
     const {
       name,
@@ -113,6 +126,25 @@ class ScheduleControler {
     });
 
     res.status(201).json(schedule);
+  }
+
+  async confirmPending(req, res) {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!isValidUUID(id)) {
+      return res.status(400).json({ error: 'Invalid schedule id' });
+    }
+
+    const scheduleExists = await ScheduleRepository.findById(id);
+
+    if (!scheduleExists) {
+      return res.status(404).json({ error: 'Schedule not found' });
+    }
+
+    const confirmedSchedule = await ScheduleRepository.confirmSchedule(id, { status: status || 'confirmado' });
+
+    res.json(confirmedSchedule);
   }
 
   async update(req, res) {
