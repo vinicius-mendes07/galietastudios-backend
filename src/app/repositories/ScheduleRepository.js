@@ -5,7 +5,7 @@ class ScheduleRepository {
     const rows = await db.query(`
     SELECT id, name, phone, email, hour, hour_end, available, status, service_id, user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date
     FROM schedules
-    WHERE schedule_date >= $1
+    WHERE schedule_date >= $1 AND available = true
     ORDER BY schedule_date
     `, [currentDate]);
 
@@ -37,7 +37,7 @@ class ScheduleRepository {
     const rows = await db.query(`
       SELECT id, name, phone, email, hour, hour_end, available, status, service_id, user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date
       FROM schedules
-      WHERE status = 'pendente' AND schedule_date >= $1
+      WHERE status = 'pendente' AND schedule_date >= $1  AND available = true
       ORDER BY schedule_date
     `, [currentDate]);
 
@@ -48,7 +48,7 @@ class ScheduleRepository {
     const rows = await db.query(`
       SELECT id, name, phone, email, hour, hour_end, available, status, service_id, user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date
       FROM schedules
-      WHERE status = 'confirmado' AND schedule_date >= $1
+      WHERE status = 'confirmado' AND schedule_date >= $1  AND available = true
       ORDER BY schedule_date
     `, [currentDate]);
 
