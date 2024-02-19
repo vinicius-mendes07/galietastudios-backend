@@ -1,6 +1,8 @@
 const ScheduleRepository = require('../repositories/ScheduleRepository');
 const ServiceRepository = require('../repositories/ServiceRepository');
 const UserRepository = require('../repositories/UserRepository');
+
+const getCurrentDate = require('../utils/getCurrentDate');
 const dateHasPassed = require('../utils/dateHasPassed');
 const isValidUUID = require('../utils/isValidUUID');
 const sumTime = require('../utils/sumTime');
@@ -9,14 +11,9 @@ const user_id = process.env.USER_ID;
 
 class ScheduleControler {
   async index(req, res) {
-    const currentDate = new Date();
-    currentDate.setUTCHours(0, 0, 0, 0);
+    const currentDate = getCurrentDate();
 
-    const ISODate = currentDate.toISOString();
-
-    const dateOnly = ISODate.split('T')[0];
-
-    const schedules = await ScheduleRepository.findAll(dateOnly);
+    const schedules = await ScheduleRepository.findAll(currentDate);
 
     res.json(schedules);
   }
@@ -37,28 +34,26 @@ class ScheduleControler {
     res.json(schedule);
   }
 
+  async getCanceled(req, res) {
+    const currentDate = getCurrentDate();
+
+    const canceledDays = await ScheduleRepository.findCanceledDays(currentDate);
+
+    res.json(canceledDays);
+  }
+
   async getPendings(req, res) {
-    const currentDate = new Date();
-    currentDate.setUTCHours(0, 0, 0, 0);
+    const currentDate = getCurrentDate();
 
-    const ISODate = currentDate.toISOString();
-
-    const dateOnly = ISODate.split('T')[0];
-
-    const schedules = await ScheduleRepository.findByPending(dateOnly);
+    const schedules = await ScheduleRepository.findByPending(currentDate);
 
     res.json(schedules);
   }
 
   async getConfirmed(req, res) {
-    const currentDate = new Date();
-    currentDate.setUTCHours(0, 0, 0, 0);
+    const currentDate = getCurrentDate();
 
-    const ISODate = currentDate.toISOString();
-
-    const dateOnly = ISODate.split('T')[0];
-
-    const schedules = await ScheduleRepository.findByConfirmed(dateOnly);
+    const schedules = await ScheduleRepository.findByConfirmed(currentDate);
 
     res.json(schedules);
   }
@@ -115,7 +110,7 @@ class ScheduleControler {
     });
 
     if (scheduleExists) {
-      return res.status(400).json({ error: 'This date and time is already scheduled' });
+      return res.status(400).json({ error: 'This date and time is not available' });
     }
 
     const hour_end = sumTime(hour, service.duration);

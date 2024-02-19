@@ -21,6 +21,7 @@ router.delete('/users/:id', UserController.delete);
 
 router.get('/schedules', ScheduleController.index);
 router.get('/schedules/pending', ScheduleController.getPendings);
+router.get('/schedules/canceled', ScheduleController.getCanceled);
 router.get('/schedules/confirmed', ScheduleController.getConfirmed);
 router.get('/schedules/:id', ScheduleController.show);
 router.post('/schedules/cancel-day', ScheduleController.cancelDay);

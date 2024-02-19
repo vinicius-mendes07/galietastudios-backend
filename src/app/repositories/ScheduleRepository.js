@@ -12,6 +12,17 @@ class ScheduleRepository {
     return rows;
   }
 
+  async findCanceledDays(currentDate) {
+    const rows = await db.query(`
+    SELECT id, name, phone, email, hour, hour_end, available, status, service_id, user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date
+    FROM schedules
+    WHERE schedule_date >= $1 AND available = false
+    ORDER BY schedule_date
+    `, [currentDate]);
+
+    return rows;
+  }
+
   async findById(id) {
     const [row] = await db.query(`
     SELECT id, name, phone, email, hour, hour_end, available, status, service_id, user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date
