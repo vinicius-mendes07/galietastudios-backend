@@ -7,7 +7,14 @@ const sumTime = require('../utils/sumTime');
 
 class ScheduleControler {
   async index(req, res) {
-    const schedules = await ScheduleRepository.findAll();
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
+
+    const ISODate = currentDate.toISOString();
+
+    const dateOnly = ISODate.split('T')[0];
+
+    const schedules = await ScheduleRepository.findAll(dateOnly);
 
     res.json(schedules);
   }
@@ -26,6 +33,19 @@ class ScheduleControler {
     }
 
     res.json(schedule);
+  }
+
+  async getPendings(req, res) {
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
+
+    const ISODate = currentDate.toISOString();
+
+    const dateOnly = ISODate.split('T')[0];
+
+    const schedules = await ScheduleRepository.findByPending(dateOnly);
+
+    res.json(schedules);
   }
 
   async store(req, res) {

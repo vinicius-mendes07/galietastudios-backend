@@ -2,7 +2,7 @@ const { Router } = require('express');
 const ScheduleController = require('./app/controllers/ScheduleController');
 const ServiceController = require('./app/controllers/ServiceController');
 const UserController = require('./app/controllers/UserController');
-const authService = require('./services/authService');
+const authService = require('./app/services/authService');
 
 const router = Router();
 
@@ -20,6 +20,7 @@ router.put('/users/:id', authService, UserController.update);
 router.delete('/users/:id', UserController.delete);
 
 router.get('/schedules', ScheduleController.index);
+router.get('/schedules/pending', ScheduleController.getPendings);
 router.get('/schedules/:id', ScheduleController.show);
 router.post('/schedules', ScheduleController.store);
 router.put('/schedules/:id', ScheduleController.update);
