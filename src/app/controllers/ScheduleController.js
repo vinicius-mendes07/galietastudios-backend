@@ -2,6 +2,8 @@ const ScheduleRepository = require('../repositories/ScheduleRepository');
 const ServiceRepository = require('../repositories/ServiceRepository');
 const UserRepository = require('../repositories/UserRepository');
 
+const sendEmail = require('../services/emailService');
+
 const getCurrentDate = require('../utils/getCurrentDate');
 const dateHasPassed = require('../utils/dateHasPassed');
 const isValidUUID = require('../utils/isValidUUID');
@@ -126,6 +128,26 @@ class ScheduleControler {
       user_id,
     });
 
+    sendEmail({
+      subject: 'Agendamento solicitado com sucesso',
+      message: `
+      Você solicitou um agendamento na Galieta Barber Shop.
+      Data: ${schedule.schedule_date}
+      Hora: ${schedule.hour}`,
+    });
+    sendEmail({
+      subject: 'Nova solicitação de agendamento',
+      message: `
+      Há um cliente solicitando agendamento.
+      Data: ${schedule.schedule_date}
+      Hora: ${schedule.hour}
+      nome: ${schedule.name},
+      telefone: ${schedule.phone},
+      email: ${schedule.email},
+      hora: ${schedule.hour},
+      Serviço: ${schedule.service_id}`,
+    });
+
     res.status(201).json(schedule);
   }
 
@@ -144,6 +166,16 @@ class ScheduleControler {
     }
 
     const confirmedSchedule = await ScheduleRepository.confirmSchedule(id, { status: status || 'confirmado' });
+
+    sendEmail({
+      subject: 'Agendamento confirmado!',
+      message: `
+        Seu agendamento na Galieta Barber Shop foi confirmado!
+        Data: ${confirmedSchedule.schedule_date}
+        Hora: ${confirmedSchedule.hour}
+        Serviço: ${confirmedSchedule.service_id}
+      `,
+    });
 
     res.json(confirmedSchedule);
   }
@@ -268,7 +300,20 @@ class ScheduleControler {
       return res.status(400).json({ error: 'Invalid schedule id' });
     }
 
+    const scheduleExists = await ScheduleRepository.findById(id);
+
+    if (!scheduleExists) {
+      return res.status(404).json({ error: 'Schedule not found' });
+    }
+
     await ScheduleRepository.delete(id);
+    sendEmail({
+      subject: 'Agendamento cancelado',
+      message: `
+        Infelizmente, seu agendamento para a data ${scheduleExists.schedule_date} as ${scheduleExists.hour} foi cancelado.
+        Você pode fazer um novo agendamento no nosso site: [endereco.site.com]/agendar
+      `,
+    });
     res.sendStatus(204);
   }
 }
