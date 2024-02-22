@@ -1,22 +1,44 @@
 const db = require('../../database');
 
 class ScheduleRepository {
-  async findAll(currentDate) {
-    const rows = await db.query(`
-    SELECT id, name, phone, email, hour, hour_end, available, status, service_id, user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date
-    FROM schedules
-    WHERE schedule_date >= $1 AND available = true
-    ORDER BY schedule_date, hour
-    `, [currentDate]);
+  async findAll(currentDate, date = '') {
+    let rows = [];
+    if (date === '') {
+      rows = await db.query(`
+      SELECT schedules.id, schedules.name AS client_name, schedules.phone AS client_phone, schedules.email AS client_email, schedules.hour, schedules.hour_end, schedules.available, schedules.status, schedules.service_id, schedules.user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date,
+      services.service_type, services.duration,
+      users.name AS barber_name, users.phone AS barber_phone, users.email AS barber_email
+      FROM schedules
+      LEFT JOIN services ON services.id = schedules.service_id
+      LEFT JOIN users ON users.id = schedules.user_id
+      WHERE schedule_date >= $1 AND available = true
+      ORDER BY schedule_date, hour
+      `, [currentDate]);
+    } else {
+      rows = await db.query(`
+      SELECT schedules.id, schedules.name AS client_name, schedules.phone AS client_phone, schedules.email AS client_email, schedules.hour, schedules.hour_end, schedules.available, schedules.status, schedules.service_id, schedules.user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date,
+      services.service_type, services.duration,
+      users.name AS barber_name, users.phone AS barber_phone, users.email AS barber_email
+      FROM schedules
+      LEFT JOIN services ON services.id = schedules.service_id
+      LEFT JOIN users ON users.id = schedules.user_id
+      WHERE schedule_date >= $1 AND available = true AND schedule_date = $2
+      ORDER BY schedule_date, hour
+      `, [currentDate, date]);
+    }
 
     return rows;
   }
 
   async findById(id) {
     const [row] = await db.query(`
-    SELECT id, name, phone, email, hour, hour_end, available, status, service_id, user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date
+    SELECT schedules.id, schedules.name AS client_name, schedules.phone AS client_phone, schedules.email AS client_email, schedules.hour, schedules.hour_end, schedules.available, schedules.status, schedules.service_id, schedules.user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date,
+    services.service_type, services.duration,
+    users.name AS barber_name, users.phone AS barber_phone, users.email AS barber_email
     FROM schedules
-    WHERE id = $1
+    LEFT JOIN services ON services.id = schedules.service_id
+    LEFT JOIN users ON users.id = schedules.user_id
+    WHERE schedules.id = $1
     `, [id]);
 
     return row;
@@ -24,8 +46,10 @@ class ScheduleRepository {
 
   async findCanceledDays(currentDate) {
     const rows = await db.query(`
-    SELECT id, name, phone, email, hour, hour_end, available, status, service_id, user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date
+    SELECT schedules.id, schedules.available, schedules.user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date,
+    users.name AS barber_name, users.phone AS barber_phone, users.email AS barber_email
     FROM schedules
+    LEFT JOIN users ON users.id = schedules.user_id
     WHERE schedule_date >= $1 AND available = false
     ORDER BY schedule_date, hour
     `, [currentDate]);
@@ -35,8 +59,12 @@ class ScheduleRepository {
 
   async findByPending(currentDate) {
     const rows = await db.query(`
-      SELECT id, name, phone, email, hour, hour_end, available, status, service_id, user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date
+      SELECT schedules.id, schedules.name AS client_name, schedules.phone AS client_phone, schedules.email AS client_email, schedules.hour, schedules.hour_end, schedules.available, schedules.status, schedules.service_id, schedules.user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date,
+      services.service_type, services.duration,
+      users.name AS barber_name, users.phone AS barber_phone, users.email AS barber_email
       FROM schedules
+      LEFT JOIN services ON services.id = schedules.service_id
+      LEFT JOIN users ON users.id = schedules.user_id
       WHERE status = 'pendente' AND schedule_date >= $1  AND available = true
       ORDER BY schedule_date, hour
     `, [currentDate]);
@@ -46,8 +74,12 @@ class ScheduleRepository {
 
   async findByConfirmed(currentDate) {
     const rows = await db.query(`
-      SELECT id, name, phone, email, hour, hour_end, available, status, service_id, user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date
+      SELECT schedules.id, schedules.name AS client_name, schedules.phone AS client_phone, schedules.email AS client_email, schedules.hour, schedules.hour_end, schedules.available, schedules.status, schedules.service_id, schedules.user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date,
+      services.service_type, services.duration,
+      users.name AS barber_name, users.phone AS barber_phone, users.email AS barber_email
       FROM schedules
+      LEFT JOIN services ON services.id = schedules.service_id
+      LEFT JOIN users ON users.id = schedules.user_id
       WHERE status = 'confirmado' AND schedule_date >= $1  AND available = true
       ORDER BY schedule_date, hour
     `, [currentDate]);
