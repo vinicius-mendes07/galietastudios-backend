@@ -3,6 +3,7 @@ require('express-async-errors');
 const express = require('express');
 const router = require('./router');
 const errorHandler = require('./app/middlewares/errorHandler');
+require('./app/services/jobs');
 
 const app = express();
 

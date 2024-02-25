@@ -8,14 +8,16 @@ const getCurrentDate = require('../utils/getCurrentDate');
 const dateHasPassed = require('../utils/dateHasPassed');
 const isValidUUID = require('../utils/isValidUUID');
 const sumTime = require('../utils/sumTime');
+const getDateAndHourPortugalTimeZone = require('../utils/getDateAndHourPortugalTimeZone');
 
 const user_id = process.env.USER_ID;
 
 class ScheduleControler {
   async index(req, res) {
+    const { date } = req.query;
     const currentDate = getCurrentDate();
 
-    const schedules = await ScheduleRepository.findAll(currentDate);
+    const schedules = await ScheduleRepository.findAll(currentDate, date);
 
     res.json(schedules);
   }
@@ -128,25 +130,35 @@ class ScheduleControler {
       user_id,
     });
 
+    const {
+      dateInPortugal,
+      hourInPortugal,
+    } = getDateAndHourPortugalTimeZone(schedule.schedule_date, schedule.hour);
+
     sendEmail({
       subject: 'Agendamento solicitado com sucesso',
       message: `
       Você solicitou um agendamento na Galieta Barber Shop.
-      Data: ${schedule.schedule_date}
-      Hora: ${schedule.hour}`,
-    });
-    sendEmail({
-      subject: 'Nova solicitação de agendamento',
-      message: `
-      Há um cliente solicitando agendamento.
-      Data: ${schedule.schedule_date}
-      Hora: ${schedule.hour}
-      nome: ${schedule.name},
-      telefone: ${schedule.phone},
-      email: ${schedule.email},
-      hora: ${schedule.hour},
-      Serviço: ${schedule.service_id}`,
-    });
+      Data: ${dateInPortugal}
+      Hora: ${hourInPortugal}`,
+    })
+      .then((info) => console.log('E-mail sent: ', info.response))
+      .catch((error) => console.log('Error to send email: ', error))
+      .finally(() => {
+        sendEmail({
+          subject: 'Nova solicitação de agendamento',
+          message: `
+          Há um cliente solicitando agendamento.
+          Data: ${dateInPortugal}
+          Hora: ${hourInPortugal}
+          nome: ${schedule.name}
+          telefone: ${schedule.phone}
+          email: ${schedule.email}
+          Serviço: ${schedule.service_id}`,
+        })
+          .then((info) => console.log('E-mail sent: ', info.response))
+          .catch((error) => console.log('Error to send email: ', error));
+      });
 
     res.status(201).json(schedule);
   }
@@ -167,15 +179,22 @@ class ScheduleControler {
 
     const confirmedSchedule = await ScheduleRepository.confirmSchedule(id, { status: status || 'confirmado' });
 
+    const {
+      dateInPortugal,
+      hourInPortugal,
+    } = getDateAndHourPortugalTimeZone(confirmedSchedule.schedule_date, confirmedSchedule.hour);
+
     sendEmail({
       subject: 'Agendamento confirmado!',
       message: `
         Seu agendamento na Galieta Barber Shop foi confirmado!
-        Data: ${confirmedSchedule.schedule_date}
-        Hora: ${confirmedSchedule.hour}
+        Data: ${dateInPortugal}
+        Hora: ${hourInPortugal}
         Serviço: ${confirmedSchedule.service_id}
       `,
-    });
+    })
+      .then((info) => console.log('E-mail sent: ', info.response))
+      .catch((error) => console.log('Error to send email: ', error));
 
     res.json(confirmedSchedule);
   }
@@ -193,11 +212,7 @@ class ScheduleControler {
       return res.status(400).json({ error: 'There is schedules in this date' });
     }
 
-    const service_id = 'f8f49f23-8e06-48e5-9b23-5d93ffc992f9';
-
-    if (!isValidUUID(service_id)) return res.status(400).json({ error: 'Invalid service id' });
-
-    const service = await ServiceRepository.findById(service_id);
+    const [service] = await ServiceRepository.findAll();
 
     if (!service) {
       return res.status(404).json({ error: 'Service not found' });
@@ -213,7 +228,7 @@ class ScheduleControler {
       hour,
       hour_end,
       available: false,
-      service_id,
+      service_id: service.id,
       user_id,
     });
 
@@ -307,13 +322,24 @@ class ScheduleControler {
     }
 
     await ScheduleRepository.delete(id);
-    sendEmail({
-      subject: 'Agendamento cancelado',
-      message: `
-        Infelizmente, seu agendamento para a data ${scheduleExists.schedule_date} as ${scheduleExists.hour} foi cancelado.
-        Você pode fazer um novo agendamento no nosso site: [endereco.site.com]/agendar
-      `,
-    });
+
+    const {
+      dateInPortugal,
+      hourInPortugal,
+    } = getDateAndHourPortugalTimeZone(scheduleExists.schedule_date, scheduleExists.hour);
+
+    if (scheduleExists.available) {
+      sendEmail({
+        subject: 'Agendamento cancelado',
+        message: `
+          Infelizmente, seu agendamento para a data ${dateInPortugal} as ${hourInPortugal} foi cancelado.
+          Você pode fazer um novo agendamento no nosso site: [endereco.site.com]/agendar
+        `,
+      })
+        .then((info) => console.log('E-mail sent: ', info.response))
+        .catch((error) => console.log('Error to sent email: ', error));
+    }
+
     res.sendStatus(204);
   }
 }
