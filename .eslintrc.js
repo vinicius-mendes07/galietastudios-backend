@@ -26,5 +26,7 @@ module.exports = {
     camelcase: 'off',
     'consistent-return': 'off',
     'no-unused-vars': ['error', { argsIgnorePattern: 'next' }],
+    'no-restricted-syntax': 'off',
+    'no-await-in-loop': 'off',
   },
 };
