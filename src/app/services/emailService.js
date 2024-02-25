@@ -1,29 +1,32 @@
 const nodemailer = require('nodemailer');
 
+const { EMAIL_USER, EMAIL_PASSWORD } = process.env;
+
+const transporter = nodemailer.createTransport({
+  service: 'hotmail',
+  pool: true,
+  auth: {
+    user: EMAIL_USER,
+    pass: EMAIL_PASSWORD,
+  },
+});
+
 function sendEmail({ subject, message }) {
-  const { EMAIL_USER, EMAIL_PASSWORD } = process.env;
+  return new Promise((resolve, reject) => {
+    const mailOptions = {
+      from: EMAIL_USER,
+      to: 'viniciushenrique43290@gmail.com', // Receber como parametro: email do cliente
+      subject,
+      text: message,
+    };
 
-  const mailOptions = {
-    from: EMAIL_USER,
-    to: 'viniciushenrique43290@gmail.com', // Receber como parametro: email do cliente
-    subject,
-    text: message,
-  };
-
-  const transporter = nodemailer.createTransport({
-    service: 'hotmail',
-    auth: {
-      user: EMAIL_USER,
-      pass: EMAIL_PASSWORD,
-    },
-  });
-
-  transporter.sendMail(mailOptions, (err, info) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Mensagem enviada com sucesso: ', info.messageId);
-    }
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(info);
+      }
+    });
   });
 }
 
