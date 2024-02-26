@@ -19,15 +19,15 @@ router.post('/users/login', UserController.login);
 router.put('/users/:id', authService, UserController.update);
 router.delete('/users/:id', UserController.delete);
 
-router.get('/schedules', ScheduleController.index);
-router.get('/schedules/pending', ScheduleController.getPendings);
-router.get('/schedules/canceled', ScheduleController.getCanceled);
-router.get('/schedules/confirmed', ScheduleController.getConfirmed);
-router.get('/schedules/:id', ScheduleController.show);
-router.post('/schedules/cancel-day', ScheduleController.cancelDay);
+router.get('/schedules', authService, ScheduleController.index);
+router.get('/schedules/pending', authService, ScheduleController.getPendings);
+router.get('/schedules/canceled', authService, ScheduleController.getCanceled);
+router.get('/schedules/confirmed', authService, ScheduleController.getConfirmed);
+router.get('/schedules/:id', authService, ScheduleController.show);
+router.post('/schedules/cancel-day', authService, ScheduleController.cancelDay);
 router.post('/schedules', ScheduleController.store);
-router.patch('/schedules/confirm/:id', ScheduleController.confirmPending);
-router.put('/schedules/:id', ScheduleController.update);
-router.delete('/schedules/:id', ScheduleController.delete);
+router.patch('/schedules/confirm/:id', authService, ScheduleController.confirmPending);
+router.put('/schedules/:id', authService, ScheduleController.update);
+router.delete('/schedules/:id', authService, ScheduleController.delete);
 
 module.exports = router;

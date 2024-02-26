@@ -179,6 +179,10 @@ class ScheduleControler {
       return res.status(404).json({ error: 'Schedule not found' });
     }
 
+    if (scheduleExists.status === 'confirmado') {
+      return res.status(400).json({ error: 'This schedule is already confirmed' });
+    }
+
     const confirmedSchedule = await ScheduleRepository.confirmSchedule(id, { status: status || 'confirmado' });
 
     const {
@@ -208,10 +212,13 @@ class ScheduleControler {
       return res.status(400).json({ error: 'Date to cancel is required' });
     }
 
-    const schedules = await ScheduleRepository.findByDay(schedule_date);
+    const schedule = await ScheduleRepository.findByDay(schedule_date);
 
-    if (schedules.length > 0) {
-      return res.status(400).json({ error: 'There is schedules in this date' });
+    if (schedule) {
+      if (schedule.available) {
+        return res.status(400).json({ error: 'There is schedules in this date' });
+      }
+      return res.status(400).json({ error: 'This date is already canceled' });
     }
 
     const [service] = await ServiceRepository.findAll();
