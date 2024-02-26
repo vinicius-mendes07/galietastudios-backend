@@ -8,9 +8,9 @@ const router = Router();
 
 router.get('/services', ServiceController.index);
 router.get('/services/:id', ServiceController.show);
-router.post('/services', ServiceController.store);
-router.put('/services/:id', ServiceController.update);
-router.delete('/services/:id', ServiceController.delete);
+router.post('/services', authService, ServiceController.store);
+router.put('/services/:id', authService, ServiceController.update);
+router.delete('/services/:id', authService, ServiceController.delete);
 
 router.get('/users', UserController.index);
 router.get('/users/:id', authService, UserController.show);

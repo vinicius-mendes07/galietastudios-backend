@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
 const UserRepository = require('../repositories/UserRepository');
+
+const loggedUserIsAdministrator = require('../utils/loggedUserIsAdministrator');
 const isValidUUID = require('../utils/isValidUUID');
 
 class UserController {
@@ -18,7 +21,7 @@ class UserController {
       return res.status(400).json({ error: 'Invalid user id' });
     }
 
-    if (loggedUser.id !== id && loggedUser.role !== 'administrador') {
+    if (loggedUser.id !== id && !loggedUserIsAdministrator(loggedUser.role)) {
       return res.status(403).json({ error: 'Permission denied' });
     }
 
@@ -55,7 +58,7 @@ class UserController {
       phone,
       email,
       password: hash,
-      role: 'administrador', // role must be 'administrador' or 'colaborador'
+      role: 'administrador', // role must be 'administrador' or 'colaborador' - pegar da req
     });
 
     res.status(201).json(user);
@@ -107,7 +110,7 @@ class UserController {
     if (!email) return res.status(400).json({ error: 'Email is required' });
     if (!password) return res.status(400).json({ error: 'Password is required' });
 
-    if (loggedUser.id !== id && loggedUser.role !== 'administrador') {
+    if (loggedUser.id !== id && !loggedUserIsAdministrator(loggedUser.role)) {
       return res.status(403).json({ error: 'Permission denied' });
     }
 
@@ -131,7 +134,7 @@ class UserController {
       phone,
       email,
       password: hash,
-      role: 'colaborador',
+      role: 'administrador', // role must be 'administrador' or 'colaborador' - pegar da req
     });
 
     res.json(user);

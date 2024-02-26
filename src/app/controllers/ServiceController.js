@@ -1,5 +1,6 @@
 const ServiceRepository = require('../repositories/ServiceRepository');
 const isValidUUID = require('../utils/isValidUUID');
+const loggedUserIsAdministrator = require('../utils/loggedUserIsAdministrator');
 
 class ServiceController {
   async index(req, res) {
@@ -26,6 +27,7 @@ class ServiceController {
 
   async store(req, res) {
     const { service_type, duration } = req.body;
+    const loggedUser = req.user;
 
     if (!service_type) {
       return res.status(400).json({ error: 'Service type is required' });
@@ -36,6 +38,10 @@ class ServiceController {
     }
     if (duration !== 30 && duration !== 60) {
       return res.status(400).json({ error: 'Duration must be 30 or 60' });
+    }
+
+    if (!loggedUserIsAdministrator(loggedUser.role)) {
+      return res.status(403).json({ error: 'Permission denied' });
     }
 
     const serviceExists = await ServiceRepository.findByServiceType(service_type);
@@ -52,6 +58,7 @@ class ServiceController {
   async update(req, res) {
     const { id } = req.params;
     const { service_type, duration } = req.body;
+    const loggedUser = req.user;
 
     if (!isValidUUID(id)) {
       return res.status(400).json({ error: 'Invalid service id' });
@@ -66,6 +73,10 @@ class ServiceController {
     }
     if (duration !== 30 && duration !== 60) {
       return res.status(400).json({ error: 'duration must be 30 or 60' });
+    }
+
+    if (!loggedUserIsAdministrator(loggedUser.role)) {
+      return res.status(403).json({ error: 'Permission denied' });
     }
 
     const serviceExists = await ServiceRepository.findById(id);
@@ -87,9 +98,14 @@ class ServiceController {
 
   async delete(req, res) {
     const { id } = req.params;
+    const loggedUser = req.user;
 
     if (!isValidUUID(id)) {
       return res.status(400).json({ error: 'Invalid service id' });
+    }
+
+    if (!loggedUserIsAdministrator(loggedUser.role)) {
+      return res.status(403).json({ error: 'Permission denied' });
     }
 
     await ServiceRepository.delete(id);
