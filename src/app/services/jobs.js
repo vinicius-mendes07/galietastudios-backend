@@ -15,7 +15,7 @@ async function sendNotification() {
   for (const schedule of schedules) {
     const scheduleDateMinus24Hours = new Date(`${schedule.schedule_date}T${schedule.hour}Z`);
     scheduleDateMinus24Hours.setUTCHours(scheduleDateMinus24Hours.getUTCHours() - 24);
-    console.log('scheduleDate Minus 24Hours', scheduleDateMinus24Hours);
+    console.log('\nscheduleDate Minus 24Hours', scheduleDateMinus24Hours);
 
     const scheduleDateMinusOneHour = new Date(`${schedule.schedule_date}T${schedule.hour}Z`);
     scheduleDateMinusOneHour.setUTCHours(scheduleDateMinusOneHour.getUTCHours() - 1);

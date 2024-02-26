@@ -140,7 +140,9 @@ class ScheduleControler {
       message: `
       Você solicitou um agendamento na Galieta Barber Shop.
       Data: ${dateInPortugal}
-      Hora: ${hourInPortugal}`,
+      Hora: ${hourInPortugal}
+      Serviço: ${service.service_type}
+      `,
     })
       .then((info) => console.log('E-mail sent: ', info.response))
       .catch((error) => console.log('Error to send email: ', error))
@@ -154,7 +156,7 @@ class ScheduleControler {
           nome: ${schedule.name}
           telefone: ${schedule.phone}
           email: ${schedule.email}
-          Serviço: ${schedule.service_id}`,
+          Serviço: ${service.service_type}`,
         })
           .then((info) => console.log('E-mail sent: ', info.response))
           .catch((error) => console.log('Error to send email: ', error));
@@ -190,7 +192,7 @@ class ScheduleControler {
         Seu agendamento na Galieta Barber Shop foi confirmado!
         Data: ${dateInPortugal}
         Hora: ${hourInPortugal}
-        Serviço: ${confirmedSchedule.service_id}
+        Serviço: ${scheduleExists.service_type}
       `,
     })
       .then((info) => console.log('E-mail sent: ', info.response))
