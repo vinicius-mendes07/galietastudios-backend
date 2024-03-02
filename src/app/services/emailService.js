@@ -15,9 +15,9 @@ function sendEmail({ subject, message }) {
   return new Promise((resolve, reject) => {
     const mailOptions = {
       from: EMAIL_USER,
-      to: 'viniciushenrique43290@gmail.com', // Receber como parametro: email do cliente
+      to: ['vinicius.henrique.92@hotmail.com', 'viniciushenrique43290@gmail.com'], // Receber como parametro: email do cliente
       subject,
-      text: message,
+      html: message,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {

@@ -4,11 +4,16 @@ const UserRepository = require('../repositories/UserRepository');
 
 const sendEmail = require('../services/emailService');
 
+const getDateAndHourPortugalTimeZone = require('../utils/getDateAndHourPortugalTimeZone');
 const getCurrentDate = require('../utils/getCurrentDate');
 const dateHasPassed = require('../utils/dateHasPassed');
 const isValidUUID = require('../utils/isValidUUID');
 const sumTime = require('../utils/sumTime');
-const getDateAndHourPortugalTimeZone = require('../utils/getDateAndHourPortugalTimeZone');
+
+const newScheduleEmail = require('../messages/emails/barber/newScheduleEmail');
+const scheduleRequestEmail = require('../messages/emails/client/scheduleRequestEmail');
+const confirmedScheduleEmail = require('../messages/emails/client/confirmedScheduleEmail');
+const canceledScheduleEmail = require('../messages/emails/client/canceledScheduleEmail');
 
 const user_id = process.env.USER_ID;
 
@@ -137,26 +142,25 @@ class ScheduleControler {
 
     sendEmail({
       subject: 'Agendamento solicitado com sucesso',
-      message: `
-      Você solicitou um agendamento na Galieta Barber Shop.
-      Data: ${dateInPortugal}
-      Hora: ${hourInPortugal}
-      Serviço: ${service.service_type}
-      `,
+      message: scheduleRequestEmail({
+        dateInPortugal,
+        hourInPortugal,
+        service_type: service.service_type,
+      }),
     })
       .then((info) => console.log('E-mail sent: ', info.response))
       .catch((error) => console.log('Error to send email: ', error))
       .finally(() => {
         sendEmail({
           subject: 'Nova solicitação de agendamento',
-          message: `
-          Há um cliente solicitando agendamento.
-          Data: ${dateInPortugal}
-          Hora: ${hourInPortugal}
-          nome: ${schedule.name}
-          telefone: ${schedule.phone}
-          email: ${schedule.email}
-          Serviço: ${service.service_type}`,
+          message: newScheduleEmail({
+            dateInPortugal,
+            hourInPortugal,
+            service_type: service.service_type,
+            name: schedule.name,
+            phone: schedule.phone,
+            email: schedule.email,
+          }),
         })
           .then((info) => console.log('E-mail sent: ', info.response))
           .catch((error) => console.log('Error to send email: ', error));
@@ -192,12 +196,11 @@ class ScheduleControler {
 
     sendEmail({
       subject: 'Agendamento confirmado!',
-      message: `
-        Seu agendamento na Galieta Barber Shop foi confirmado!
-        Data: ${dateInPortugal}
-        Hora: ${hourInPortugal}
-        Serviço: ${scheduleExists.service_type}
-      `,
+      message: confirmedScheduleEmail({
+        dateInPortugal,
+        hourInPortugal,
+        service_type: scheduleExists.service_type,
+      }),
     })
       .then((info) => console.log('E-mail sent: ', info.response))
       .catch((error) => console.log('Error to send email: ', error));
@@ -340,10 +343,7 @@ class ScheduleControler {
     if (scheduleExists.available) {
       sendEmail({
         subject: 'Agendamento cancelado',
-        message: `
-          Infelizmente, seu agendamento para a data ${dateInPortugal} as ${hourInPortugal} foi cancelado.
-          Você pode fazer um novo agendamento no nosso site: [endereco.site.com]/agendar
-        `,
+        message: canceledScheduleEmail({ dateInPortugal, hourInPortugal }),
       })
         .then((info) => console.log('E-mail sent: ', info.response))
         .catch((error) => console.log('Error to sent email: ', error));
