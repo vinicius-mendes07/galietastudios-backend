@@ -7,7 +7,9 @@ function getDateAndHourPortugalTimeZone(date, hour) {
 
   const dateAndHour = scheduleDatePortugalFormat.split(', ');
   const dateInPortugal = dateAndHour[0];
-  const hourInPortugal = dateAndHour[1];
+
+  const hourWithSeconds = dateAndHour[1];
+  const hourInPortugal = hourWithSeconds.substring(0, 5);
 
   return {
     dateInPortugal: dateInPortugal || date,
