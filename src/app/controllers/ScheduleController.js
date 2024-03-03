@@ -3,6 +3,7 @@ const ServiceRepository = require('../repositories/ServiceRepository');
 const UserRepository = require('../repositories/UserRepository');
 
 const sendEmail = require('../services/emailService');
+const sendMessage = require('../services/smsService');
 
 const getDateAndHourPortugalTimeZone = require('../utils/getDateAndHourPortugalTimeZone');
 const getCurrentDate = require('../utils/getCurrentDate');
@@ -14,6 +15,9 @@ const newScheduleEmail = require('../messages/emails/barber/newScheduleEmail');
 const scheduleRequestEmail = require('../messages/emails/client/scheduleRequestEmail');
 const confirmedScheduleEmail = require('../messages/emails/client/confirmedScheduleEmail');
 const canceledScheduleEmail = require('../messages/emails/client/canceledScheduleEmail');
+
+const scheduleRequestSms = require('../messages/sms/client/scheduleRequestSms');
+const newScheduleSms = require('../messages/sms/barber/newScheduleSms');
 
 const user_id = process.env.USER_ID;
 
@@ -165,6 +169,21 @@ class ScheduleControler {
           .then((info) => console.log('E-mail sent: ', info.response))
           .catch((error) => console.log('Error to send email: ', error));
       });
+
+    sendMessage(scheduleRequestSms({
+      dateInPortugal,
+      hourInPortugal,
+      service_type: service.service_type,
+    }));
+
+    sendMessage(newScheduleSms({
+      dateInPortugal,
+      hourInPortugal,
+      service_type: service.service_type,
+      name: schedule.name,
+      phone: schedule.phone,
+      email: schedule.email,
+    }));
 
     res.status(201).json(schedule);
   }
