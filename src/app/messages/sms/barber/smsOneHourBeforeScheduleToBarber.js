@@ -1,4 +1,4 @@
-function sms24HoursBeforeScheduleToBarber({
+function smsOneHourBeforeScheduleToBarber({
   dateInPortugal,
   hourInPortugal,
   service_type,
@@ -6,7 +6,7 @@ function sms24HoursBeforeScheduleToBarber({
   client_phone,
 }) {
   return `
-Voca tem um agendamento amanha.
+Voce tem um agendamento em uma hora.
 
 Data: ${dateInPortugal}
 Hora: ${hourInPortugal}
@@ -16,4 +16,4 @@ Telefone: ${client_phone}
 `;
 }
 
-module.exports = sms24HoursBeforeScheduleToBarber;
+module.exports = smsOneHourBeforeScheduleToBarber;

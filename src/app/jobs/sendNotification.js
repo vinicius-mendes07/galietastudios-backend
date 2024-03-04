@@ -15,6 +15,8 @@ const emailOneHourBeforeScheduleToBarber = require('../messages/emails/barber/em
 
 const sms24HoursBeforeScheduleToBarber = require('../messages/sms/barber/sms24HoursBeforeScheduleToBarber');
 const sms24HoursBeforeScheduleToClient = require('../messages/sms/client/sms24HoursBeforeScheduleToClient');
+const smsOneHourBeforeScheduleToClient = require('../messages/sms/client/smsOneHourBeforeScheduleToClient');
+const smsOneHourBeforeScheduleToBarber = require('../messages/sms/barber/smsOneHourBeforeScheduleToBarber');
 
 async function sendNotification() {
   const currentDate = getCurrentDate();
@@ -87,6 +89,12 @@ async function sendNotification() {
       });
       console.log(clientResult);
 
+      sendSms(smsOneHourBeforeScheduleToClient({
+        dateInPortugal,
+        hourInPortugal,
+        service_type: schedule.service_type,
+      }));
+
       const barberResult = await sendEmail({
         subject: 'Agendamento em uma hora',
         message: emailOneHourBeforeScheduleToBarber({
@@ -99,6 +107,14 @@ async function sendNotification() {
         }),
       });
       console.log(barberResult);
+
+      sendSms(smsOneHourBeforeScheduleToBarber({
+        dateInPortugal,
+        hourInPortugal,
+        service_type: schedule.service_type,
+        client_name: schedule.client_name,
+        client_phone: schedule.client_phone,
+      }));
     }
   }
 }

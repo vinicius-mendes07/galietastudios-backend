@@ -7,8 +7,7 @@ function confirmedScheduleEmail({
 }) {
   return defaultEmail(`
   <h1>
-    <span>Prepare-se para ficar ainda mais estiloso!</span>
-    <span>Seu horário foi confirmado!</span>
+    Seu horário foi confirmado!
   </h1>
 
   <p>Data: ${dateInPortugal}</p>
