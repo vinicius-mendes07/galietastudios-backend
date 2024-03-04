@@ -4,21 +4,17 @@ function newScheduleSms({
   service_type,
   name,
   phone,
-  email,
 }) {
   return `
-Há um cliente solicitando agendamento!
+Novo agendamento!
 
 Data: ${dateInPortugal}
-
 Hora: ${hourInPortugal}
-
-Serviço: ${service_type}
+Servico: ${service_type}
 
 Nome: ${name}
 Telefone: ${phone}
-Email: ${email}
-  `;
+`;
 }
 
 module.exports = newScheduleSms;

@@ -182,7 +182,6 @@ class ScheduleControler {
       service_type: service.service_type,
       name: schedule.name,
       phone: schedule.phone,
-      email: schedule.email,
     }));
 
     res.status(201).json(schedule);

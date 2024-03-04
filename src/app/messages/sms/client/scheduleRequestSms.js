@@ -4,18 +4,12 @@ function scheduleRequestSms({
   service_type,
 }) {
   return `
-Sua solicitação de agendamento foi efetuada com sucesso!
+Solicitacao de agendamento efetuada para ${dateInPortugal}, às ${hourInPortugal}.
 
-Data: ${dateInPortugal}
+Servico: ${service_type}.
 
-Hora: ${hourInPortugal}
-
-Serviço: ${service_type}
-
-Aguarde confirmação!
-
-Entraremos em contato assim que seu agendamento for confirmado!
-  `;
+Entraremos em contato apos confirmacao!
+`;
 }
 
 module.exports = scheduleRequestSms;
