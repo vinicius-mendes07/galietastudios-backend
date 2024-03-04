@@ -6,11 +6,15 @@ const getDateAndHourPortugalTimeZone = require('../utils/getDateAndHourPortugalT
 const getCurrentDate = require('../utils/getCurrentDate');
 
 const sendEmail = require('../services/emailService');
+const sendSms = require('../services/smsService');
 
 const email24HoursBeforeScheduleToClient = require('../messages/emails/client/email24HoursBeforeScheduleToClient');
 const email24HoursBeforeScheduleToBarber = require('../messages/emails/barber/email24HoursBeforeScheduleToBarber');
 const emailOneHourBeforeScheduleToClient = require('../messages/emails/client/emailOneHourBeforeScheduleToClient');
 const emailOneHourBeforeScheduleToBarber = require('../messages/emails/barber/emailOneHourBeforeScheduleToBarber');
+
+const sms24HoursBeforeScheduleToBarber = require('../messages/sms/barber/sms24HoursBeforeScheduleToBarber');
+const sms24HoursBeforeScheduleToClient = require('../messages/sms/client/sms24HoursBeforeScheduleToClient');
 
 async function sendNotification() {
   const currentDate = getCurrentDate();
@@ -44,6 +48,12 @@ async function sendNotification() {
       });
       console.log(clientResult);
 
+      sendSms(sms24HoursBeforeScheduleToClient({
+        dateInPortugal,
+        hourInPortugal,
+        service_type: schedule.service_type,
+      }));
+
       const barberResult = await sendEmail({
         subject: 'Agendamento amanhã',
         message: email24HoursBeforeScheduleToBarber({
@@ -56,6 +66,14 @@ async function sendNotification() {
         }),
       });
       console.log(barberResult);
+
+      sendSms(sms24HoursBeforeScheduleToBarber({
+        dateInPortugal,
+        hourInPortugal,
+        service_type: schedule.service_type,
+        client_name: schedule.client_name,
+        client_phone: schedule.client_phone,
+      }));
     } else if (currentDateAndtime.getTime() === scheduleDateMinusOneHour.getTime()) {
       // envia mensagem se for 1h antes do agendamento
 
