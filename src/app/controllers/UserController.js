@@ -87,7 +87,7 @@ class UserController {
       return res.status(404).json({ error: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.SECRET, { expiresIn: '1m' });
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.SECRET, { expiresIn: '1d' });
 
     res.json({ token });
   }

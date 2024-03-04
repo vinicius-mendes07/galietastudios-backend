@@ -6,7 +6,7 @@ function sms24HoursBeforeScheduleToBarber({
   client_phone,
 }) {
   return `
-Voca tem um agendamento amanha.
+Voce tem um agendamento amanha.
 
 Data: ${dateInPortugal}
 Hora: ${hourInPortugal}
