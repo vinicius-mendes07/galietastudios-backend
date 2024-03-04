@@ -3,7 +3,7 @@ const ServiceRepository = require('../repositories/ServiceRepository');
 const UserRepository = require('../repositories/UserRepository');
 
 const sendEmail = require('../services/emailService');
-const sendMessage = require('../services/smsService');
+const sendSms = require('../services/smsService');
 
 const getDateAndHourPortugalTimeZone = require('../utils/getDateAndHourPortugalTimeZone');
 const getCurrentDate = require('../utils/getCurrentDate');
@@ -18,6 +18,8 @@ const canceledScheduleEmail = require('../messages/emails/client/canceledSchedul
 
 const scheduleRequestSms = require('../messages/sms/client/scheduleRequestSms');
 const newScheduleSms = require('../messages/sms/barber/newScheduleSms');
+const confirmedScheduleSms = require('../messages/sms/client/confirmedScheduleSms');
+const canceledScheduleSms = require('../messages/sms/client/canceledScheduleSms');
 
 const user_id = process.env.USER_ID;
 
@@ -170,13 +172,13 @@ class ScheduleControler {
           .catch((error) => console.log('Error to send email: ', error));
       });
 
-    sendMessage(scheduleRequestSms({
+    sendSms(scheduleRequestSms({
       dateInPortugal,
       hourInPortugal,
       service_type: service.service_type,
     }));
 
-    sendMessage(newScheduleSms({
+    sendSms(newScheduleSms({
       dateInPortugal,
       hourInPortugal,
       service_type: service.service_type,
@@ -222,6 +224,12 @@ class ScheduleControler {
     })
       .then((info) => console.log('E-mail sent: ', info.response))
       .catch((error) => console.log('Error to send email: ', error));
+
+    sendSms(confirmedScheduleSms({
+      dateInPortugal,
+      hourInPortugal,
+      service_type: scheduleExists.service_type,
+    }));
 
     res.json(confirmedSchedule);
   }
@@ -365,6 +373,8 @@ class ScheduleControler {
       })
         .then((info) => console.log('E-mail sent: ', info.response))
         .catch((error) => console.log('Error to sent email: ', error));
+
+      sendSms(canceledScheduleSms({ dateInPortugal, hourInPortugal }));
     }
 
     res.sendStatus(204);
