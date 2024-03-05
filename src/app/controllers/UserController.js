@@ -87,7 +87,7 @@ class UserController {
       return res.status(404).json({ error: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.SECRET, { expiresIn: '7d' });
 
     res.json({ token });
   }
@@ -108,7 +108,6 @@ class UserController {
     if (!name) return res.status(400).json({ error: 'Name is required' });
     if (!phone) return res.status(400).json({ error: 'Phone is required' });
     if (!email) return res.status(400).json({ error: 'Email is required' });
-    if (!password) return res.status(400).json({ error: 'Password is required' });
 
     if (loggedUser.id !== id && !loggedUserIsAdministrator(loggedUser.role)) {
       return res.status(403).json({ error: 'Permission denied' });
@@ -126,8 +125,14 @@ class UserController {
       return res.status(400).json({ error: 'This email is already in use' });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
+    let hash = '';
+
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      hash = await bcrypt.hash(password, salt);
+    } else {
+      hash = null;
+    }
 
     const user = await UserRepository.update(id, {
       name,
@@ -137,7 +142,7 @@ class UserController {
       role: 'administrador', // role must be 'administrador' or 'colaborador' - pegar da req
     });
 
-    res.json(user);
+    return res.json(user);
   }
 
   async delete(req, res) {

@@ -8,7 +8,7 @@ class UserRepository {
   }
 
   async findById(id) {
-    const [row] = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+    const [row] = await db.query('SELECT id, name, phone, email, role FROM users WHERE id = $1', [id]);
 
     return row;
   }
@@ -35,15 +35,25 @@ class UserRepository {
     name,
     phone,
     email,
-    password,
     role,
+    password,
   }) {
+    if (password) {
+      const [row] = await db.query(`
+        UPDATE users
+        SET name = $1, phone = $2, email = $3, password = $4, role = $5
+        WHERE id = $6
+        RETURNING *
+      `, [name, phone, email, password, role, id]);
+
+      return row;
+    }
     const [row] = await db.query(`
       UPDATE users
-      SET name = $1, phone = $2, email = $3, password = $4, role = $5
-      WHERE id = $6
+      SET name = $1, phone = $2, email = $3,  role = $4
+      WHERE id = $5
       RETURNING *
-    `, [name, phone, email, password, role, id]);
+    `, [name, phone, email, role, id]);
 
     return row;
   }
