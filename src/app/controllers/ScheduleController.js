@@ -96,13 +96,21 @@ class ScheduleControler {
       return res.status(400).json({ error: 'This date has passed' });
     }
 
-    const service = await ServiceRepository.findById(service_id);
+    const [
+      service,
+      userExists,
+      scheduleDateNotAvailable,
+      scheduleExists,
+    ] = await Promise.all([
+      ServiceRepository.findById(service_id),
+      UserRepository.findById(user_id),
+      ScheduleRepository.findByDateNotAvailable(schedule_date),
+      ScheduleRepository.findByDateAndHour({ schedule_date, hour, user_id }),
+    ]);
 
     if (!service) {
       return res.status(404).json({ error: 'Service not found' });
     }
-
-    const userExists = await UserRepository.findById(user_id);
 
     if (!userExists) {
       return res.status(404).json({ error: 'User not found' });
@@ -112,17 +120,9 @@ class ScheduleControler {
       return res.status(400).json({ error: 'This email is already in use' });
     }
 
-    const scheduleDateNotAvailable = await ScheduleRepository.findByDateNotAvailable(schedule_date);
-
     if (scheduleDateNotAvailable) {
       return res.status(400).json({ error: 'This date is not available' });
     }
-
-    const scheduleExists = await ScheduleRepository.findByDateAndHour({
-      schedule_date,
-      hour,
-      user_id,
-    });
 
     if (scheduleExists) {
       return res.status(400).json({ error: 'This date and time is not available' });
@@ -207,7 +207,9 @@ class ScheduleControler {
       return res.status(400).json({ error: 'This schedule is already confirmed' });
     }
 
-    const confirmedSchedule = await ScheduleRepository.confirmSchedule(id, { status: status || 'confirmado' });
+    const confirmedSchedule = await ScheduleRepository.confirmSchedule(id, {
+      status: status !== 'confirmado' ? 'confirmado' : status,
+    });
 
     const {
       dateInPortugal,
@@ -298,13 +300,14 @@ class ScheduleControler {
       return res.status(400).json({ error: 'This date has passed' });
     }
 
-    const service = await ServiceRepository.findById(service_id);
+    const [service, userExists] = await Promise.all([
+      ServiceRepository.findById(service_id),
+      UserRepository.findById(user_id),
+    ]);
 
     if (!service) {
       return res.status(404).json({ error: 'Service not found' });
     }
-
-    const userExists = await UserRepository.findById(user_id);
 
     if (!userExists) {
       return res.status(404).json({ error: 'User not found' });
