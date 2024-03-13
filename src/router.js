@@ -12,16 +12,16 @@ router.post('/services', authService, ServiceController.store);
 router.put('/services/:id', authService, ServiceController.update);
 router.delete('/services/:id', authService, ServiceController.delete);
 
-router.get('/users', UserController.index);
+// router.get('/users', UserController.index);
 router.get('/users/:id', authService, UserController.show);
-router.post('/users', UserController.store);
+// router.post('/users', UserController.store);
 router.post('/users/login', UserController.login);
 router.put('/users/:id', authService, UserController.update);
-router.delete('/users/:id', UserController.delete);
+// router.delete('/users/:id', UserController.delete);
 
-router.get('/schedules', authService, ScheduleController.index);
+router.get('/schedules', ScheduleController.index);
 router.get('/schedules/pending', authService, ScheduleController.getPendings);
-router.get('/schedules/canceled', authService, ScheduleController.getCanceled);
+router.get('/schedules/canceled', ScheduleController.getCanceled);
 router.get('/schedules/confirmed', authService, ScheduleController.getConfirmed);
 router.get('/schedules/:id', authService, ScheduleController.show);
 router.post('/schedules/cancel-day', authService, ScheduleController.cancelDay);
