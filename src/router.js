@@ -20,6 +20,7 @@ router.put('/users/:id', authService, UserController.update);
 // router.delete('/users/:id', UserController.delete);
 
 router.get('/schedules', ScheduleController.index);
+router.get('/schedules/schedules-and-canceled-days', ScheduleController.getSchedulesAndCanceledDays);
 router.get('/schedules/pending', authService, ScheduleController.getPendings);
 router.get('/schedules/canceled', ScheduleController.getCanceled);
 router.get('/schedules/confirmed', authService, ScheduleController.getConfirmed);

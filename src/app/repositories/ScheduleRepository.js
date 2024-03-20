@@ -30,6 +30,23 @@ class ScheduleRepository {
     return rows;
   }
 
+  async findSchedulesAndCanceledDays(currentDate) {
+    let rows = [];
+
+    rows = await db.query(`
+      SELECT schedules.id, schedules.name AS client_name, schedules.phone AS client_phone, schedules.email AS client_email, schedules.hour, schedules.hour_end, schedules.available, schedules.status, schedules.service_id, schedules.user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date,
+      services.service_type, services.duration,
+      users.name AS barber_name, users.phone AS barber_phone, users.email AS barber_email
+      FROM schedules
+      LEFT JOIN services ON services.id = schedules.service_id
+      LEFT JOIN users ON users.id = schedules.user_id
+      WHERE schedule_date >= $1
+      ORDER BY schedule_date, hour
+      `, [currentDate]);
+
+    return rows;
+  }
+
   async findById(id) {
     const [row] = await db.query(`
     SELECT schedules.id, schedules.name AS client_name, schedules.phone AS client_phone, schedules.email AS client_email, schedules.hour, schedules.hour_end, schedules.available, schedules.status, schedules.service_id, schedules.user_id, TO_CHAR(schedule_date, 'YYYY-MM-DD') AS schedule_date,

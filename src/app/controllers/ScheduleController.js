@@ -33,6 +33,14 @@ class ScheduleControler {
     res.json(schedules);
   }
 
+  async getSchedulesAndCanceledDays(req, res) {
+    const currentDate = getCurrentDate();
+
+    const schedules = await ScheduleRepository.findSchedulesAndCanceledDays(currentDate);
+
+    res.json(schedules);
+  }
+
   async show(req, res) {
     const { id } = req.params;
 
