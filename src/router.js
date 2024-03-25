@@ -16,7 +16,7 @@ router.delete('/services/:id', authService, ServiceController.delete);
 router.get('/users/:id', authService, UserController.show);
 // router.post('/users', UserController.store);
 router.post('/users/login', UserController.login);
-router.put('/users/:id', authService, UserController.update);
+router.put('/users/current', authService, UserController.update);
 // router.delete('/users/:id', UserController.delete);
 
 router.get('/schedules', ScheduleController.index);

@@ -7,7 +7,7 @@ async function authService(req, res, next) {
   const token = authorization && authorization.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ error: 'Token not found' });
+    return res.status(401).json({ tokenError: true, error: 'Token not found' });
   }
 
   try {
@@ -23,7 +23,7 @@ async function authService(req, res, next) {
 
     next();
   } catch (error) {
-    res.status(400).json({ error: 'Invalid token' });
+    res.status(400).json({ tokenError: true, error: 'Invalid token' });
   }
 }
 

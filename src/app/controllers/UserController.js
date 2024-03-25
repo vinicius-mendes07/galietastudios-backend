@@ -87,21 +87,19 @@ class UserController {
       return res.status(404).json({ error: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.SECRET, { expiresIn: '30m' });
 
     res.json({ token });
   }
 
   async update(req, res) {
-    const { id } = req.params;
-
-    const {
-      name, phone, email, password,
-    } = req.body;
-
     const loggedUser = req.user;
 
-    if (!isValidUUID(id)) {
+    const {
+      name, phone, email, newPassword,
+    } = req.body;
+
+    if (!isValidUUID(loggedUser.id)) {
       return res.status(400).json({ error: 'Invalid user id' });
     }
 
@@ -109,11 +107,7 @@ class UserController {
     if (!phone) return res.status(400).json({ error: 'Phone is required' });
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
-    if (loggedUser.id !== id && !loggedUserIsAdministrator(loggedUser.role)) {
-      return res.status(403).json({ error: 'Permission denied' });
-    }
-
-    const userExists = await UserRepository.findById(id);
+    const userExists = await UserRepository.findById(loggedUser.id);
 
     if (!userExists) {
       return res.status(404).json({ error: 'User not found' });
@@ -121,20 +115,20 @@ class UserController {
 
     const userByEmail = await UserRepository.findByEmail(email);
 
-    if (userByEmail && userByEmail.id !== id) {
+    if (userByEmail && userByEmail.id !== loggedUser.id) {
       return res.status(400).json({ error: 'This email is already in use' });
     }
 
     let hash = '';
 
-    if (password) {
+    if (newPassword) {
       const salt = await bcrypt.genSalt(10);
-      hash = await bcrypt.hash(password, salt);
+      hash = await bcrypt.hash(newPassword, salt);
     } else {
       hash = null;
     }
 
-    const user = await UserRepository.update(id, {
+    const user = await UserRepository.update(loggedUser.id, {
       name,
       phone,
       email,
