@@ -13,7 +13,7 @@ router.put('/services/:id', authService, ServiceController.update);
 router.delete('/services/:id', authService, ServiceController.delete);
 
 // router.get('/users', UserController.index);
-router.get('/users/:id', authService, UserController.show);
+router.get('/users/current', authService, UserController.show);
 // router.post('/users', UserController.store);
 router.post('/users/login', UserController.login);
 router.put('/users/current', authService, UserController.update);

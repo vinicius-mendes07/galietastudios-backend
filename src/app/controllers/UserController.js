@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 
 const UserRepository = require('../repositories/UserRepository');
 
-const loggedUserIsAdministrator = require('../utils/loggedUserIsAdministrator');
 const isValidUUID = require('../utils/isValidUUID');
 
 class UserController {
@@ -14,24 +13,19 @@ class UserController {
   }
 
   async show(req, res) {
-    const { id } = req.params;
     const loggedUser = req.user;
 
-    if (!isValidUUID(id)) {
+    if (!isValidUUID(loggedUser.id)) {
       return res.status(400).json({ error: 'Invalid user id' });
     }
 
-    if (loggedUser.id !== id && !loggedUserIsAdministrator(loggedUser.role)) {
-      return res.status(403).json({ error: 'Permission denied' });
-    }
-
-    const user = await UserRepository.findById(id);
+    const user = await UserRepository.findById(loggedUser.id);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json({ user });
+    res.json(user);
   }
 
   async store(req, res) {
