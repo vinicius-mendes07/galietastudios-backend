@@ -1,3 +1,4 @@
+const formatPhone = require('../../../utils/formatPhone');
 const defaultEmail = require('../defaultEmail');
 
 function newScheduleEmail({
@@ -20,7 +21,7 @@ function newScheduleEmail({
   <p>Serviço: ${service_type}</p>
 
   <p>Nome: ${name}</p>
-  <p>Telefone: ${phone}</p>
+  <p>Telefone: ${formatPhone(phone)}</p>
   <p>Email: ${email}</p>
   `);
 }

@@ -1,3 +1,5 @@
+const formatPhone = require('../../../utils/formatPhone');
+
 function newScheduleSms({
   dateInPortugal,
   hourInPortugal,
@@ -13,7 +15,7 @@ Hora: ${hourInPortugal}
 Servico: ${service_type}
 
 Nome: ${name}
-Telefone: ${phone}
+Telefone: ${formatPhone(phone)}
 `;
 }
 

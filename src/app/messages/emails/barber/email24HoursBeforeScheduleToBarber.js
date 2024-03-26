@@ -1,3 +1,4 @@
+const formatPhone = require('../../../utils/formatPhone');
 const defaultEmail = require('../defaultEmail');
 
 function email24HoursBeforeScheduleToBarber({
@@ -18,7 +19,7 @@ function email24HoursBeforeScheduleToBarber({
   <p>Hora: ${hourInPortugal}</p>
   <p>Serviço: ${service_type}</p>
   <p>Nome: ${client_name}</p>
-  <p>Telefone: ${client_phone}</p>
+  <p>Telefone: ${formatPhone(client_phone)}</p>
   <p>Email: ${client_email}</p>
   `);
 }
