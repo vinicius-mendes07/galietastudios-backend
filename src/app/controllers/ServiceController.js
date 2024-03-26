@@ -1,4 +1,6 @@
+const ScheduleRepository = require('../repositories/ScheduleRepository');
 const ServiceRepository = require('../repositories/ServiceRepository');
+const getCurrentDate = require('../utils/getCurrentDate');
 const isValidUUID = require('../utils/isValidUUID');
 const loggedUserIsAdministrator = require('../utils/loggedUserIsAdministrator');
 
@@ -106,6 +108,14 @@ class ServiceController {
 
     if (!loggedUserIsAdministrator(loggedUser.role)) {
       return res.status(403).json({ error: 'Permission denied' });
+    }
+
+    const currentDate = getCurrentDate();
+
+    const hasSchedules = await ScheduleRepository.findByServiceId({ id, currentDate });
+
+    if (hasSchedules.length > 0) {
+      return res.status(400).json({ error: 'There are schedules in this service' });
     }
 
     await ServiceRepository.delete(id);
